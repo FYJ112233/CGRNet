@@ -35,8 +35,6 @@ You may need mannully define the data path first.
 
 Parameters: More parameters can be found in the script.
 
-Sampling Strategy: N (= bacth size) person identities are randomly sampled at each step, then randomly select four visible and four thermal image. Details can be found in Line 302-307 in train.py.
-
 Training Log: The training log will be saved in log/" dataset_name"+ log. Model will be saved in save_model/.
 
 3. Testing.
