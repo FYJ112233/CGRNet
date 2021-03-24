@@ -1,6 +1,6 @@
 Paper:Efficient Cross-modality Graph Reasoning for RGB-Infrared Person Re-identification
 
-Pytorch Code for Cross-Modality Person Re-Identification (Visible Thermal Re-ID) on RegDB dataset [1] and SYSU-MM01 dataset [2].
+Pytorch Code for Cross-Modality Person Re-Identification (Visible Thermal Re-ID) on RegDB dataset and SYSU-MM01 dataset.
 
 We adopt the two-stream network structure introduced in . ResNet50 is adopted as the backbone. The softmax loss is adopted as the baseline.
 
