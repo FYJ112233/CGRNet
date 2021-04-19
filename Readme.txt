@@ -53,7 +53,7 @@ python test.py --mode all --resume 'model_path' --gpu 1 --dataset sysu
 
 
 
-This code largely benefits from following repositories: https://github.com/mangye16/Cross-Modal-Re-ID-baseline and https://github.com/zhanghang1989/PyTorch-Encoding .I am very grateful to the author (@mangye16) for his contribution and help.
+This code largely benefits from following repositories: https://github.com/mangye16/Cross-Modal-Re-ID-baseline. I am very grateful to the author (@mangye16) for his contribution and help.
 
 References
 
