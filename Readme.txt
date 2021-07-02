@@ -6,7 +6,7 @@ We adopt the two-stream network structure introduced in . ResNet50 is adopted as
 
 Datasets Rank@1	mAP		
 #RegDB 75.58% 67.86%		
-#SYSU-MM01 52.64%	51.37%	
+#SYSU-MM01 52.64% 51.37%	
 *Both of these two datasets may have some fluctuation due to random spliting. The results might be better by finetuning the hyper-parameters.
 
 1. Prepare the datasets.
