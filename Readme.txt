@@ -1,5 +1,14 @@
 Paper:Efficient Cross-modality Graph Reasoning for RGB-Infrared Person Re-identification
 
+@article{jian2021efficient,
+  title={Efficient Cross-modality Graph Reasoning for RGB-Infrared Person Re-identification},
+  author={Jian, Feng Yu and Chen, Feng and Ji, Yi-mu and Wu, Fei and Sun, Jing},
+  journal={IEEE Signal Processing Letters},
+  year={2021},
+  publisher={IEEE}
+}
+
+
 Pytorch Code for Cross-Modality Person Re-Identification (Visible Thermal Re-ID) on RegDB dataset and SYSU-MM01 dataset.
 
 We adopt the two-stream network structure introduced in . ResNet50 is adopted as the backbone. The softmax loss is adopted as the baseline.
