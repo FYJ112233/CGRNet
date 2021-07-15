@@ -1,8 +1,7 @@
 #this work base on non-lcal block
 # we aims to use channel non-local to reduce modality discrepancy and two spatial non-local to reduce pose transformation
 
-#author Chenfeng
-#email chenfeng1271@gmail.com
+
 
 import torch
 import torch.nn as nn
@@ -205,19 +204,32 @@ class embed_net(nn.Module):
 
         self.thermal_block = base_resblock(arch=arch)
         self.visible_block = base_resblock(arch=arch)
-   
+        #self.discriminator_rgb = Discriminator(n_layer=4, middle_dim=32, num_scales=2)
+        #self.discriminator_ir = Discriminator(n_layer=4, middle_dim=32, num_scales=2)
+
 
         
         self.cam1 = CAM_Module(64)
         self.cam2 = CAM_Module(64)
 
-     
+        #self.decoder11 = _Decoder_block(256,128,64)
+        #self.decoder12 = _Decoder_block(64,32,3)
+
+        #self.decoder21 = _Decoder_block(256,128,64)
+        #self.decoder22 = _Decoder_block(64,32,3)
+
+        #self.decoder1 = Decoder(n_upsample=2,n_res=2,dim=256, output_dim=3, res_norm='adain', activ='relu', pad_type='reflect')
+        #self.decoder2 = Decoder(n_upsample=2,n_res=2,dim=256, output_dim=3, res_norm='adain', activ='relu', pad_type='reflect')
+
+        ####spatial align###
+        #self.cross_pam1 = PAM_Module(512)
+        #self.cross_pam2 = PAM_Module(512)
 
        
         
-        self.local2local = LLM(512)
-        self.local2global = LLM(512)
-        self.global2local = LLM(512)
+        self.local2local = PAM_Module(512)
+        self.local2global = PAM_Module(512)
+        self.global2local = PAM_Module(512)
 
         self.common_block = base_resblock(arch=arch)
 
@@ -254,8 +266,11 @@ class embed_net(nn.Module):
      
             x2 = self.thermal_block(x2,idx=1)
 
+            # x1_cam, atten1 = self.cam1(x1,x1,True)
+            # x2_cam, atten2 = self.cam2(x2,x2,True)
+
             x = torch.cat((x1, x2), 0)
-  
+            # x = torch.cat((x1_cam,x2_cam),0)
 
 
       
@@ -263,6 +278,7 @@ class embed_net(nn.Module):
             x1 = self.visible_module(x1_rgb)
             x1 = self.visible_block(x1,idx=1)
             x = self.cam1(x1,x1)
+            #x = self.pam1(x,x)
 
 
         elif modal == 2:
@@ -272,6 +288,20 @@ class embed_net(nn.Module):
             #x = self.pam2(x,x)
 
         x = self.common_block(x,idx=2)
+
+        # x_local2local = self.local2local(x,x)
+        #
+        # x_global = self.avgpool(x)
+        # x_global = x_global.expand_as(x)
+        #
+        # x_global2local = self.global2local(x,x_global)
+        #
+        # x_local2global = self.local2global(x_global,x)
+        #
+        # x = x + x_global2local +x_local2local + x_local2global
+
+
+
 
 
         x = self.base_resnet(x)
@@ -316,11 +346,11 @@ class ReID_net(nn.Module):
             
 
 
-class LLM(nn.Module):
+class PAM_Module(nn.Module):
     """ Position attention module"""
     #Ref from SAGAN
     def __init__(self, in_dim):
-        super(LLM, self).__init__()
+        super(PAM_Module, self).__init__()
         self.chanel_in = in_dim
 
         self.query_conv = nn.Conv2d(in_channels=in_dim, out_channels=in_dim//16, kernel_size=1)
@@ -394,6 +424,85 @@ class CAM_Module(nn.Module):
             return out
 
 
+class ACFModule(nn.Module):
+    """ Multi-Head Attention module """
+    def __init__(self, n_head, n_mix, d_model, d_k, d_v, norm_layer=torch.nn.BatchNorm2d,
+                 kq_transform='conv', value_transform='conv',
+                 pooling=True, concat=False, dropout=0.1):
+        super(ACFModule, self).__init__()
+
+        self.n_head = n_head
+        self.n_mix = n_mix
+        self.d_k = d_k
+        self.d_v = d_v
+        self.pooling = pooling
+        self.concat = concat
+
+        if self.pooling:
+            self.pool = nn.AvgPool2d(3, 2, 1, count_include_pad=False)
+
+        if kq_transform == 'conv':
+            self.conv_qs = nn.Conv2d(d_model, n_head*d_k, 1)
+            nn.init.normal_(self.conv_qs.weight, mean=0, std=np.sqrt(2.0 / (d_model + d_k)))
+        elif kq_transform == 'dffn':
+            self.conv_qs = nn.Sequential(
+                nn.Conv2d(d_model, n_head*d_k, 3, padding=1, bias=False),
+                norm_layer(n_head*d_k),
+                nn.ReLU(True),
+                nn.Conv2d(n_head*d_k, n_head*d_k, 1),
+            )
+            nn.init.normal_(self.conv_qs[-1].weight, mean=0, std=np.sqrt(1.0 / d_k))
+        elif kq_transform == 'dffn':
+            self.conv_qs = nn.Sequential(
+                nn.Conv2d(d_model, n_head*d_k, 3, padding=4, dilation=4, bias=False),
+                norm_layer(n_head*d_k),
+                nn.ReLU(True),
+                nn.Conv2d(n_head*d_k, n_head*d_k, 1),
+            )
+            nn.init.normal_(self.conv_qs[-1].weight, mean=0, std=np.sqrt(1.0 / d_k))
+        else:
+            raise NotImplemented
+        #self.conv_ks = nn.Conv2d(d_model, n_head*d_k, 1)
+        self.conv_ks = self.conv_qs
+        if value_transform == 'conv':
+            self.conv_vs = nn.Conv2d(d_model, n_head*d_v, 1)
+        else:
+            raise NotImplemented
+
+        #nn.init.normal_(self.conv_ks.weight, mean=0, std=np.sqrt(2.0 / (d_model + d_k)))
+        nn.init.normal_(self.conv_vs.weight, mean=0, std=np.sqrt(2.0 / (d_model + d_v)))
+
+        self.attention = MixtureOfSoftMaxACF(n_mix=n_mix, d_k=d_k)
+
+        self.conv = nn.Conv2d(n_head*d_v, d_model, 1, bias=False)
+        self.norm_layer = norm_layer(d_model)
+
+    def forward(self, x):
+        residual = x
+
+        d_k, d_v, n_head = self.d_k, self.d_v, self.n_head
+        b_, c_, h_, w_ = x.size()
+
+        if self.pooling:
+            qt = self.conv_ks(x).view(b_*n_head, d_k, h_*w_)
+            kt = self.conv_ks(self.pool(x)).view(b_*n_head, d_k, h_*w_//4)
+            vt = self.conv_vs(self.pool(x)).view(b_*n_head, d_v, h_*w_//4)
+        else:
+            kt = self.conv_ks(x).view(b_*n_head, d_k, h_*w_)
+            qt = kt
+            vt = self.conv_vs(x).view(b_*n_head, d_v, h_*w_)
+
+        output, attn = self.attention(qt, kt, vt)
+
+        output = output.transpose(1, 2).contiguous().view(b_, n_head*d_v, h_, w_)
+
+        output = self.conv(output)
+        if self.concat:
+            output = torch.cat((self.norm_layer(output), residual), 1)
+        else:
+            output = self.norm_layer(output) + residual
+        return output
+
 
 
 ######Distribtor##
@@ -420,7 +529,79 @@ def weights_init(init_type='gaussian'):
     return init_fun
 
 
+##################################################################################
+# Discriminator
+##################################################################################
 
+class Discriminator(nn.Module):
+    # Multi-scale discriminator architecture
+    def __init__(self, n_layer, middle_dim, num_scales):
+        super(Discriminator, self).__init__()
+
+        self.input_dim = 3
+        self.gan_type = 'lsgan'
+        self.norm = 'none'
+        self.activ = 'lrelu'
+        self.pad_type = 'reflect'
+
+        self.n_layer = n_layer # 4
+        self.middle_dim = middle_dim # 32
+        self.num_scales = num_scales # 3
+        self.downsample = nn.AvgPool2d(3, stride=2, padding=[1, 1], count_include_pad=False)
+
+        self.cnns = nn.ModuleList()
+        for _ in range(self.num_scales):
+            self.cnns.append(self._make_net())
+
+    def _make_net(self):
+        dim = self.middle_dim
+        cnn_x = []
+        cnn_x += [Conv2dBlock(self.input_dim, dim, 4, 2, 1, norm='none', activation=self.activ, pad_type=self.pad_type)]
+        for i in range(self.n_layer - 1):
+            cnn_x += [Conv2dBlock(dim, dim * 2, 4, 2, 1, norm=self.norm, activation=self.activ, pad_type=self.pad_type)]
+            dim *= 2
+        cnn_x += [nn.Conv2d(dim, 1, 1, 1, 0)]
+        cnn_x = nn.Sequential(*cnn_x)
+        return cnn_x
+
+    def forward(self, x):
+        outputs = []
+        for model in self.cnns:
+            outputs.append(model(x))
+            x = self.downsample(x)
+        return outputs
+
+    def calc_dis_loss(self, input_fake, input_real):
+        # calculate the loss to train D
+        outs0 = self.forward(input_fake)
+        outs1 = self.forward(input_real)
+        loss = 0
+
+        for it, (out0, out1) in enumerate(zip(outs0, outs1)):
+            if self.gan_type == 'lsgan':
+                loss += torch.mean((out0 - 0)**2) + torch.mean((out1 - 1)**2)
+            elif self.gan_type == 'nsgan':
+                all0 = Variable(torch.zeros_like(out0.data).cuda(), requires_grad=False)
+                all1 = Variable(torch.ones_like(out1.data).cuda(), requires_grad=False)
+                loss += torch.mean(F.binary_cross_entropy(F.sigmoid(out0), all0) +
+                                   F.binary_cross_entropy(F.sigmoid(out1), all1))
+            else:
+                assert 0, "Unsupported GAN type: {}".format(self.gan_type)
+        return loss
+
+    def calc_gen_loss(self, input_fake):
+        # calculate the loss to train G
+        outs0 = self.forward(input_fake)
+        loss = 0
+        for it, (out0) in enumerate(outs0):
+            if self.gan_type == 'lsgan':
+                loss += torch.mean((out0 - 1)**2) # LSGAN
+            elif self.gan_type == 'nsgan':
+                all1 = Variable(torch.ones_like(out0.data).cuda(), requires_grad=False)
+                loss += torch.mean(F.binary_cross_entropy(F.sigmoid(out0), all1))
+            else:
+                assert 0, "Unsupported GAN type: {}".format(self.gan_type)
+        return loss
 
 
 class Conv2dBlock(nn.Module):
