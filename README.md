@@ -4,9 +4,7 @@
 
 Pytorch Code of CGRNet method for "Efficient Cross-modality Graph Reasoning for RGB-Infrared Person Re-identification" in 
 
-[https://ieeexplore.ieee.org/abstract/document/9468909]: 
-
-
+ [PDF](https://ieeexplore.ieee.org/abstract/document/9468909)
 
 ### Results on the SYSU-MM01 Dataset an the RegDB Dataset 
 | Method | Datasets                   | Rank@1    | Rank@10  | mAP       |
