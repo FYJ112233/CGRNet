@@ -19,11 +19,11 @@ Method |Datasets    | Rank@1  | Rank@10 |  mAP |
 
 - (1) RegDB Dataset [1]: The RegDB dataset can be downloaded from this [website](http://dm.dongguk.edu/link.html) by submitting a copyright form.
 
-    - (Named: "Dongguk Body-based Person Recognition Database (DBPerson-Recog-DB1)" on their website). 
+ 
 
 - (2) SYSU-MM01 Dataset [2]: The SYSU-MM01 dataset can be downloaded from this [website](http://isee.sysu.edu.cn/project/RGBIRReID.htm).
 
-   - run `python pre_process_sysu.py` [link](https://github.com/mangye16/Cross-Modal-Re-ID-baseline/blob/master/pre_process_sysu.py) in to pepare the dataset, the training data will be stored in ".npy" format.
+   - run `python pre_process_sysu.py` in to pepare the dataset, the training data will be stored in ".npy" format.
 
 ### 2. Training.
   Train a model by
