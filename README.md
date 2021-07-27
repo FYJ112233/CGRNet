@@ -9,13 +9,13 @@ Pytorch Code of CGRNet method for "Efficient Cross-modality Graph Reasoning for 
 
 
 ### Results on the SYSU-MM01 Dataset an the RegDB Dataset 
-Method |Datasets    | Rank@1  | Rank@10 |  mAP | 
+| Method | Datasets                   | Rank@1    | Rank@10  | mAP       |
+| ------ | -------------------------- | --------- | -------- | --------- |
+| CGRNet | #SYSU-MM01 (All-Search)    | ~ 52.64 % | ~ 85.25% | ~ 51.37 % |
+| CGRNet | #SYSU-MM01 (Indoor-Search) | ~ 60.33 % | ~ 91.26% | ~ 66.75%  |
+| CGRNet | #RegDB                     | ~ 75.58 % | ~ 88.4%  | ~67.86%   |
 
-| CGRNet|#SYSU-MM01 (All-Search)  | ~ 52.64 % | ~ 85.25% | ~ 51.37 %|
 
-| CGRNet|#SYSU-MM01 (Indoor-Search)  | ~ 60.33 % | ~ 91.26% | ~ 66.75%|
-
-| CGRNet|#RegDB  | ~ 75.58 % | ~ 88.4% | ~67.86%|
 
 *The code has been tested in Python 3.7, PyTorch=1.0. Both of these two datasets may have some fluctuation due to random spliting
 
