@@ -2,7 +2,11 @@
 
 # CGRNet
 
-Pytorch Code of CGRNet method for "Efficient Cross-modality Graph Reasoning for RGB-Infrared Person Re-identification"
+Pytorch Code of CGRNet method for "Efficient Cross-modality Graph Reasoning for RGB-Infrared Person Re-identification" in 
+
+[https://ieeexplore.ieee.org/abstract/document/9468909]: 
+
+
 
 ### Results on the SYSU-MM01 Dataset an the RegDB Dataset 
 Method |Datasets    | Rank@1  | Rank@10 |  mAP | 
@@ -19,16 +23,14 @@ Method |Datasets    | Rank@1  | Rank@10 |  mAP |
 
 - (1) RegDB Dataset [1]: The RegDB dataset can be downloaded from this [website](http://dm.dongguk.edu/link.html) by submitting a copyright form.
 
- 
-
 - (2) SYSU-MM01 Dataset [2]: The SYSU-MM01 dataset can be downloaded from this [website](http://isee.sysu.edu.cn/project/RGBIRReID.htm).
 
-   - run `python pre_process_sysu.py` in to pepare the dataset, the training data will be stored in ".npy" format.
+   - run `python pre_process_sysu.py`  in to pepare the dataset, the training data will be stored in ".npy" format.
 
 ### 2. Training.
   Train a model by
   ```bash
-python train.version3.py 
+python train.version3.py
   ```
 
   - `--dataset`: which dataset "sysu" or "regdb".
@@ -64,9 +66,13 @@ Please kindly cite the references in your publications if it helps your research
 
 ```
 [1] D. T. Nguyen, H. G. Hong, K. W. Kim, and K. R. Park. Person recognition system based on a combination of body images from visible light and thermal cameras. Sensors, 17(3):605, 2017.
+```
 
+```
 [2] A. Wu, W.-s. Zheng, H.-X. Yu, S. Gong, and J. Lai. Rgb-infrared crossmodality person re-identification. In IEEE International Conference on Computer Vision (ICCV), pages 5380–5389, 2017.
+```
 
+```
 [3] M. Ye, Z. Wang, X. Lan, and P. C. Yuen. Visible thermal person reidentification via dual-constrained top-ranking. In International Joint Conference on Artificial Intelligence (IJCAI), pages 1092–1099, 2018.
 ```
 
