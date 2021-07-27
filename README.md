@@ -37,17 +37,11 @@ python train.version3.py
 
   - `--lr`: initial learning rate.
   
-  -  `--graph`: using graph attention.
-  
-  - `--wpa`: using weighted part attention
-  
-  - `--part`: part number
-  
   - `--gpu`:  which gpu to run.
 
 You may need manually define the data path first.
 
-### 4. Citation
+### 3. Citation
 
 Please kindly cite the references in your publications if it helps your research:
 ```
@@ -60,7 +54,7 @@ Please kindly cite the references in your publications if it helps your research
 }
 ```
 
-### 5. References
+### 4. References
 
 
 
