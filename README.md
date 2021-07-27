@@ -28,7 +28,7 @@ Method |Datasets    | Rank@1  | Rank@10 |  mAP |
 ### 2. Training.
   Train a model by
   ```bash
-python train.version3.py --dataset sysu --lr 0.1 --graph --wpa --part 3 --gpu 0
+python train.version3.py 
   ```
 
   - `--dataset`: which dataset "sysu" or "regdb".
