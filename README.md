@@ -42,10 +42,12 @@ You may need manually define the data path first.
 
 Please kindly cite the references in your publications if it helps your research:
 ```
-@article{jian2021efficient,
-  title={Efficient Cross-modality Graph Reasoning for RGB-Infrared Person Re-identification},
-  author={Jian, Feng Yu and Chen, Feng and Ji, Yi-mu and Wu, Fei and Sun, Jing},
+@article{feng2021efficient,
+  title={Efficient Cross-Modality Graph Reasoning for RGB-Infrared Person Re-Identification},
+  author={Feng, Yujian and Chen, Feng and Ji, Yi-mu and Wu, Fei and Sun, Jing},
   journal={IEEE Signal Processing Letters},
+  volume={28},
+  pages={1425--1429},
   year={2021},
   publisher={IEEE}
 }
